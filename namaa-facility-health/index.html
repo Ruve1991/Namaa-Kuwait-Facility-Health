@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Namaa · Facility Health · Kuwait</title>
+<style>
+  :root{
+    --ink:#1C2422;
+    --ink-soft:#4A5552;
+    --paper:#F7F3EC;
+    --paper-raised:#FFFFFF;
+    --teal:#0F3D3E;
+    --teal-deep:#0A2C2D;
+    --teal-soft:#E4EDE9;
+    --amber:#D98E3F;
+    --amber-soft:#FBEEDD;
+    --red:#B5483B;
+    --red-soft:#F8E6E2;
+    --green:#3E7A52;
+    --green-soft:#E5F0E7;
+    --line:#E1DACB;
+    --line-soft:#EDE8DB;
+    --shadow: 0 1px 2px rgba(15,61,62,0.06), 0 4px 16px rgba(15,61,62,0.04);
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    font-size:14px;
+    line-height:1.45;
+  }
+  .num{
+    font-family: "SF Mono", "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-feature-settings: "tnum";
+    letter-spacing:-0.01em;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    background: linear-gradient(180deg, var(--teal) 0%, var(--teal-deep) 100%);
+    color:#fff;
+    padding:14px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+  }
+  .brand .mark{
+    font-weight:800;
+    letter-spacing:0.04em;
+    font-size:15px;
+    text-transform:uppercase;
+  }
+  .brand .sub{
+    font-size:13px;
+    color:rgba(255,255,255,0.7);
+    font-weight:400;
+  }
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-size:12.5px;
+    color:rgba(255,255,255,0.85);
+  }
+  .live-dot{
+    display:inline-block;
+    width:7px;height:7px;
+    border-radius:50%;
+    background:#6FCF97;
+    margin-right:6px;
+    box-shadow:0 0 0 0 rgba(111,207,151,0.7);
+    animation:pulse 2.2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(111,207,151,0.5);}
+    70%{box-shadow:0 0 0 6px rgba(111,207,151,0);}
+    100%{box-shadow:0 0 0 0 rgba(111,207,151,0);}
+  }
+  .btn{
+    border:1px solid rgba(255,255,255,0.25);
+    background:rgba(255,255,255,0.08);
+    color:#fff;
+    padding:7px 13px;
+    border-radius:7px;
+    font-size:12.5px;
+    cursor:pointer;
+    font-weight:600;
+    transition:background .15s;
+  }
+  .btn:hover{background:rgba(255,255,255,0.18);}
+  .btn.primary{
+    background:var(--amber);
+    border-color:var(--amber);
+    color:#2A1A05;
+  }
+  .btn.primary:hover{background:#E59C4F;}
+
+  /* ---------- Filter bar ---------- */
+  .filterbar{
+    background:var(--paper-raised);
+    border-bottom:1px solid var(--line);
+    padding:12px 28px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  select, input[type="text"]{
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    padding:8px 11px;
+    border-radius:7px;
+    font-size:13px;
+    font-family:inherit;
+  }
+  select{cursor:pointer; min-width:120px;}
+  input[type="text"]{min-width:200px; flex:1;}
+  .toggle-chip{
+    border:1px solid var(--line);
+    background:var(--paper);
+    padding:8px 13px;
+    border-radius:7px;
+    font-size:13px;
+    cursor:pointer;
+    font-weight:600;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .toggle-chip.active{
+    background:var(--red-soft);
+    border-color:var(--red);
+    color:var(--red);
+  }
+  .result-count{
+    margin-left:auto;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    padding:8px 4px;
+  }
+
+  .page{padding:24px 28px 60px;}
+  .section-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 4px;
+  }
+  .section-sub{
+    font-size:12px;
+    color:#8A9390;
+    font-weight:500;
+  }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    margin:30px 0 14px;
+  }
+  .section-head:first-child{margin-top:0;}
+
+  /* ---------- KPI grid ---------- */
+  .kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:14px;
+  }
+  .kpi-grid.wide{grid-template-columns:repeat(3, 1fr);}
+  @media (max-width:1100px){
+    .kpi-grid, .kpi-grid.wide{grid-template-columns:repeat(2, 1fr);}
+  }
+  @media (max-width:640px){
+    .kpi-grid, .kpi-grid.wide{grid-template-columns:1fr;}
+  }
+  .kpi-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line-soft);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    box-shadow:var(--shadow);
+  }
+  .kpi-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:#8A9390;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .kpi-value{
+    font-size:28px;
+    font-weight:700;
+    color:var(--ink);
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+  }
+  .kpi-value .delta{
+    font-size:12.5px;
+    font-weight:700;
+  }
+  .kpi-value .delta.up{color:var(--green);}
+  .kpi-value .delta.down{color:var(--red);}
+  .kpi-detail{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  .kpi-breakdown{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px solid var(--line-soft);
+  }
+  .kpi-breakdown div{font-size:11px; color:#8A9390;}
+  .kpi-breakdown b{
+    display:block;
+    font-size:13px;
+    color:var(--ink);
+    font-weight:700;
+    margin-top:1px;
+  }
+  .kpi-card.warn .kpi-value{color:var(--amber);}
+  .kpi-card.danger .kpi-value{color:var(--red);}
+  .kpi-card.good .kpi-value{color:var(--teal);}
+
+  /* ---------- Facility strip (signature element) ---------- */
+  .facility-strip{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .facility-row{
+    background:var(--paper-raised);
+    border:1px solid var(--line-soft);
+    border-radius:var(--radius);
+    padding:14px 18px;
+    box-shadow:var(--shadow);
+    display:grid;
+    grid-template-columns: 150px 1fr 90px 90px 90px 110px 28px;
+    gap:18px;
+    align-items:center;
+    cursor:pointer;
+    transition:border-color .15s;
+  }
+  .facility-row:hover{border-color:var(--teal);}
+  @media (max-width:900px){
+    .facility-row{grid-template-columns: 1fr; gap:10px;}
+  }
+  .facility-name{
+    font-weight:700;
+    font-size:14.5px;
+    color:var(--ink);
+  }
+  .facility-name .count{
+    display:block;
+    font-size:11.5px;
+    color:#8A9390;
+    font-weight:500;
+    margin-top:2px;
+  }
+  .occ-bar-wrap{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .occ-bar-track{
+    flex:1;
+    height:9px;
+    border-radius:5px;
+    background:var(--line-soft);
+    overflow:hidden;
+    display:flex;
+  }
+  .occ-bar-seg{height:100%;}
+  .occ-bar-seg.occ{background:var(--teal);}
+  .occ-bar-seg.churn{background:var(--amber);}
+  .occ-pct{
+    font-weight:700;
+    font-size:13.5px;
+    min-width:42px;
+    text-align:right;
+  }
+  .mini-stat{text-align:center;}
+  .mini-stat .v{font-weight:700; font-size:14px; color:var(--ink);}
+  .mini-stat .l{font-size:10.5px; color:#8A9390; text-transform:uppercase; letter-spacing:0.04em;}
+  .grade-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;height:26px;
+    border-radius:7px;
+    font-weight:800;
+    font-size:13px;
+    margin-left:auto;
+  }
+  .grade-pill.A{background:var(--green-soft); color:var(--green);}
+  .grade-pill.B{background:var(--amber-soft); color:var(--amber);}
+  .grade-pill.C{background:var(--red-soft); color:var(--red);}
+  .chev{color:#B8BFB9; font-size:14px;}
+
+  /* ---------- Table ---------- */
+  .table-wrap{
+    background:var(--paper-raised);
+    border:1px solid var(--line-soft);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  thead th{
+    text-align:left;
+    padding:10px 14px;
+    background:var(--teal-soft);
+    color:var(--teal-deep);
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    white-space:nowrap;
+    cursor:pointer;
+    user-select:none;
+    border-bottom:1px solid var(--line);
+  }
+  thead th:hover{background:#D7E5DE;}
+  thead th .arrow{opacity:0.4; margin-left:3px;}
+  tbody td{
+    padding:9px 14px;
+    border-bottom:1px solid var(--line-soft);
+    white-space:nowrap;
+  }
+  tbody tr{cursor:pointer;}
+  tbody tr:hover{background:#FBF9F4;}
+  tbody tr:last-child td{border-bottom:none;}
+  .status-pill{
+    display:inline-block;
+    padding:2px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:700;
+  }
+  .status-pill.Occupied{background:var(--green-soft); color:var(--green);}
+  .status-pill.Vacant{background:#EEEEEE; color:#7A7A7A;}
+  .status-pill.Churning{background:var(--red-soft); color:var(--red);}
+  .risk-dot{
+    display:inline-block;
+    width:8px;height:8px;
+    border-radius:50%;
+    margin-right:5px;
+  }
+  .risk-dot.Low{background:var(--green);}
+  .risk-dot.Medium{background:var(--amber);}
+  .risk-dot.High{background:var(--red);}
+  .table-foot{
+    padding:10px 14px;
+    font-size:12px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .pager-btn{
+    border:1px solid var(--line);
+    background:var(--paper);
+    padding:5px 11px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:12px;
+    margin-left:6px;
+  }
+  .pager-btn:disabled{opacity:0.4; cursor:default;}
+
+  /* ---------- Empty / loading ---------- */
+  .empty-state{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--ink-soft);
+  }
+  .empty-state .big{font-size:15px; font-weight:700; color:var(--ink); margin-bottom:6px;}
+
+  /* ---------- Modal (kitchen detail) ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background:rgba(10,30,30,0.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .modal-backdrop.show{display:flex;}
+  .modal{
+    background:var(--paper-raised);
+    border-radius:14px;
+    max-width:480px;
+    width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);
+    overflow:hidden;
+  }
+  .modal-head{
+    background:var(--teal);
+    color:#fff;
+    padding:18px 22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+  .modal-head h3{margin:0; font-size:17px;}
+  .modal-head .id{font-size:12px; color:rgba(255,255,255,0.7); margin-top:3px;}
+  .modal-close{
+    background:none; border:none; color:#fff;
+    font-size:20px; cursor:pointer; opacity:0.8; line-height:1;
+  }
+  .modal-body{padding:20px 22px;}
+  .modal-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:16px;
+  }
+  .modal-field .l{font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#8A9390; font-weight:700;}
+  .modal-field .v{font-size:14.5px; font-weight:600; color:var(--ink); margin-top:2px;}
+  .modal-notes{
+    background:var(--paper);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- Data source banner ---------- */
+  .banner{
+    background:var(--amber-soft);
+    border:1px solid #EBCA9A;
+    color:#7A4E14;
+    padding:10px 28px;
+    font-size:12.5px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .banner a, .banner button.linklike{
+    color:#7A4E14;
+    font-weight:700;
+    text-decoration:underline;
+    background:none; border:none; cursor:pointer; font-size:12.5px; padding:0;
+    font-family:inherit;
+  }
+
+  /* ---------- Settings modal ---------- */
+  .field-row{margin-bottom:14px;}
+  .field-row label{display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:5px;}
+  .field-row input{width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:7px; font-size:13px; font-family:inherit;}
+  .help-text{font-size:11.5px; color:#8A9390; margin-top:5px; line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="mark">Namaa</span>
+    <span class="sub">Facility Health · Kuwait</span>
+  </div>
+  <div class="topbar-right">
+    <span><span class="live-dot"></span><span id="dataSourceLabel">Sample data</span> · updated <span id="updatedTime">—</span></span>
+    <button class="btn" id="settingsBtn">⚙ Data source</button>
+    <button class="btn primary" id="exportBtn">↓ Export CSV</button>
+  </div>
+</div>
+
+<div class="banner" id="sampleBanner">
+  📊 You're viewing sample data so you can see how the dashboard works. <button class="linklike" id="bannerSettingsBtn">Connect your Google Sheet →</button>
+</div>
+
+<div class="filterbar">
+  <select id="filterFacility"><option value="">All facilities</option></select>
+  <select id="filterStatus">
+    <option value="">All statuses</option>
+    <option value="Occupied">Occupied</option>
+    <option value="Vacant">Vacant</option>
+    <option value="Churning">Churning</option>
+  </select>
+  <select id="filterType">
+    <option value="">All licensee types</option>
+    <option value="Start-up">Start-up</option>
+    <option value="Independent">Independent</option>
+    <option value="Growth">Growth</option>
+    <option value="Enterprise">Enterprise</option>
+  </select>
+  <select id="filterGrade">
+    <option value="">All grades</option>
+    <option value="A">Grade A</option>
+    <option value="B">Grade B</option>
+    <option value="C">Grade C</option>
+  </select>
+  <input type="text" id="searchBox" placeholder="Search kitchen ID, licensee...">
+  <button class="toggle-chip" id="atRiskToggle">⚑ At-risk only</button>
+  <span class="result-count" id="resultCount">— kitchens</span>
+</div>
+
+<div class="page">
+
+  <div class="section-head">
+    <div>
+      <p class="section-label">Current summary</p>
+      <p class="section-sub">The book as it stands today</p>
+    </div>
+  </div>
+  <div class="kpi-grid" id="kpiGrid1"></div>
+
+  <div class="section-head">
+    <div>
+      <p class="section-label">Performance</p>
+      <p class="section-sub">Per-licensee averages, last month</p>
+    </div>
+  </div>
+  <div class="kpi-grid" id="kpiGrid2"></div>
+
+  <div class="section-head">
+    <div>
+      <p class="section-label">Facility comparison</p>
+      <p class="section-sub">Occupancy and health across all facilities</p>
+    </div>
+  </div>
+  <div class="facility-strip" id="facilityStrip"></div>
+
+  <div class="section-head">
+    <div>
+      <p class="section-label">Kitchen directory</p>
+      <p class="section-sub">Every unit, filterable and sortable</p>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr id="tableHead"></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="table-foot">
+      <span id="pageInfo"></span>
+      <div>
+        <button class="pager-btn" id="prevPage">← Prev</button>
+        <button class="pager-btn" id="nextPage">Next →</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Kitchen detail modal -->
+<div class="modal-backdrop" id="detailModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="detailTitle">Kitchen</h3>
+        <div class="id" id="detailSub"></div>
+      </div>
+      <button class="modal-close" id="closeDetail">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-backdrop" id="settingsModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Data source</h3>
+        <div class="id">Connect your live Google Sheet</div>
+      </div>
+      <button class="modal-close" id="closeSettings">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <label>Published CSV link</label>
+        <input type="text" id="csvUrlInput" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv">
+        <div class="help-text">
+          In your Google Sheet: <b>File → Share → Publish to web</b> → select the <b>Kitchens</b> tab → format <b>Comma-separated values (.csv)</b> → Publish. Paste the link it gives you here.<br><br>
+          This is saved in your browser only — nothing is sent anywhere else.
+        </div>
+      </div>
+      <button class="btn primary" id="saveCsvUrl" style="color:#2A1A05;">Connect & reload</button>
+      <button class="btn" id="useSampleBtn" style="margin-left:8px; background:var(--paper); color:var(--ink); border-color:var(--line);">Use sample data</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
